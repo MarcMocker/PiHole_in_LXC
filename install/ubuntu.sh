@@ -20,6 +20,9 @@ apt-get update > $NULL
 info updating installed packages...
 apt-get dist-upgrade -y  > $NULL
 
+info installing curl...
+apt-get install curl -y
+
 info removing unused packages...
 apt-get autoremove -y > $NULL
 
