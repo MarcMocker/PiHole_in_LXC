@@ -43,16 +43,20 @@ wget $URL/pi-hole.conf -qO- | sudo tee $UNBOUD_CONF > $NULL
 sleep 10
 service unbound restart > $NULL
 
-echo ""
-warn SET UNBOUND THE ONLY DNS SERVER:
-warn ""
-warn "in the webui go to Settings > DNS"
-warn there you add the custom DNS entry:
-warn "        127.0.0.1#5335"
-warn and remove the selected upstream
-warn DNS servers.
-echo ""
-
+info checking if DNS server is set properly
+if ! grep -q "PIHOLE_DNS_1=127.0.0.1#5335" "$SETUP_VARS"; then
+    echo ""
+    warn SET UNBOUND THE ONLY DNS SERVER:
+    warn ""
+    warn "in the webui go to Settings > DNS"
+    warn there you add the custom DNS entry:
+    warn "        127.0.0.1#5335"
+    warn and remove the selected upstream
+    warn DNS servers.
+    echo ""
+else
+    info DNS set correctly
+fi
 
 info Please set a new password for the webgui:
 pihole -a -p
