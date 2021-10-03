@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-trap trapexit EXIT SIGTERM
 
 function info { echo -e "\e[32m[info] $*\e[39m"; }
 function warn { echo -e "\e[33m[warn] $*\e[39m"; }
@@ -74,27 +73,3 @@ while true; do
         * ) echo "Please answer boot, periodically or nothing.";;
     esac
 done
-
-
-
-trapexit() {
-  status=$?
-
-  if [[ $status -eq 0 ]]; then
-    logs=$(cat $TEMPLOG | sed -e "s/34/32/g" | sed -e "s/info/success/g")
-    clear && printf "\033c\e[3J$logs\n";
-  elif [[ -s $TEMPERR ]]; then
-    logs=$(cat $TEMPLOG | sed -e "s/34/31/g" | sed -e "s/info/error/g")
-    err=$(cat $TEMPERR | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | rev | cut -d':' -f1 | rev | cut -d' ' -f2-)
-    clear && printf "\033c\e[3J$logs\e[33m\n$0: line $LASTCMD\n\e[33;2;3m$err\e[0m\n"
-  else
-    printf "\e[33muncaught error occurred\n\e[0m"
-  fi
-
-  # Cleanup
-  apt-get remove --purge -y $DEVDEPS -qq &>/dev/null
-  apt-get autoremove -y -qq &>/dev/null
-  apt-get clean
-  rm -rf $TEMPDIR
-  rm -rf /root/.cache
-}
