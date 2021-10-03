@@ -49,7 +49,7 @@ LINE_DNS_2=$(grep -n "PIHOLE_DNS_2" $SETUP_VARS | cut -d: -f1)
 sed "${LINE_DNS_1}s/.*/PIHOLE_DNS_1=127.0.0.1#5335/g" $SETUP_VARS > $NULL
 sed "${LINE_DNS_2}s/.*/PIHOLE_DNS_2=/g" $SETUP_VARS > $NULL
 
-info Please set a new password for the webgui running: pihole -a -p
+warn Please set a new password for the webgui running: pihole -a -p
 # the pihole command is located in /usr/local/bin
 export PATH="/usr/local/bin:$PATH"
 echo export PATH='/usr/local/bin:$PATH' >> $HOME/.bashrc
