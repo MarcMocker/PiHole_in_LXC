@@ -40,6 +40,7 @@ wget https://www.internic.net/domain/named.root -qO- | sudo tee $ROOT_HINTS > $N
 
 info setting up the unbound configuration file for pihole...
 wget $URL/pi-hole.conf -qO- | sudo tee $UNBOUD_CONF > $NULL
+sleep 10
 service unbound restart > $NULL
 
 echo ""
@@ -62,7 +63,7 @@ chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
 while true; do
-    read -p "Do you wish to automatically update on boot [b], daily [d] or nothing of those [n]?" bpn
+    read -p "Do you wish to automatically update on boot [b], daily [d] or nothing of those [n]? " bpn
     case $bpn in
         [Bb]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab; break;;
         [Dd]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab; break;;
@@ -70,3 +71,5 @@ while true; do
         * ) echo "Please answer boot, periodically or nothing.";;
     esac
 done
+
+info Installation finished sucessfully!
