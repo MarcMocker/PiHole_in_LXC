@@ -59,7 +59,7 @@ else
 fi
 
 info Please set a new password for the webgui:
-pihole -a -p
+./usr/local/bin/pihole -a -p
 
 info Configuring automatic updates:
 wget $URL/autoupdate.sh -qO- | sudo tee $AUTOUPDATE_SCRIPT > $NULL
