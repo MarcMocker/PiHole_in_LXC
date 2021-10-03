@@ -42,17 +42,18 @@ info setting up the unbound configuration file for pihole...
 wget $URL/pi-hole.conf -qO- | sudo tee $UNBOUD_CONF > $NULL
 service unbound restart > $NULL
 
-info setting unbound as only DNS server...
-if [ ! -f "$SETUP_VARS" ]; then
-    warn setupVars.conf not available
-    exit 1
-fi
-LINE_DNS_1=$(grep -n "PIHOLE_DNS_1" $SETUP_VARS | cut -d: -f1)
-LINE_DNS_2=$(grep -n "PIHOLE_DNS_2" $SETUP_VARS | cut -d: -f1)
-sed "${LINE_DNS_1}s/.*/PIHOLE_DNS_1=127.0.0.1#5335/g" $SETUP_VARS > $NULL
-sed "${LINE_DNS_2}s/.*/PIHOLE_DNS_2=/g" $SETUP_VARS > $NULL
+echo ""
+warn SET UNBOUND THE ONLY DNS SERVER:
+warn ""
+warn "in the webui go to Settings > DNS"
+warn there you add the custom DNS entry:
+warn "        127.0.0.1#5335"
+warn and remove the selected upstream
+warn DNS servers.
+echo ""
 
-warn Please set a new password for the webgui running:
+
+info Please set a new password for the webgui:
 pihole -a -p
 
 info Configuring automatic updates:
