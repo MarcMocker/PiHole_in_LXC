@@ -20,10 +20,6 @@ apt-get update > $NULL
 info updating installed packages...
 apt-get dist-upgrade -y  > $NULL
 
-info installing necessary packages:
-info - curl
-apt-get install curl -y > $NULL
-
 info removing unused packages...
 apt-get autoremove -y > $NULL
 
@@ -53,11 +49,10 @@ LINE_DNS_2=$(grep -n "PIHOLE_DNS_2" $SETUP_VARS | cut -d: -f1)
 sed "${LINE_DNS_1}s/.*/PIHOLE_DNS_1=127.0.0.1#5335/g" $SETUP_VARS > $NULL
 sed "${LINE_DNS_2}s/.*/PIHOLE_DNS_2=/g" $SETUP_VARS > $NULL
 
-info Please set a new password for the webgui:
+info Please set a new password for the webgui running: pihole -a -p
 # the pihole command is located in /usr/local/bin
 export PATH="/usr/local/bin:$PATH"
 echo export PATH='/usr/local/bin:$PATH' >> $HOME/.bashrc
-pihole -a -p
 
 info Configuring automatic updates:
 wget $URL/autoupdate.sh -qO- | sudo tee $AUTOUPDATE_SCRIPT > $NULL
