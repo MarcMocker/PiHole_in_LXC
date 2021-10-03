@@ -8,7 +8,7 @@ function warn { echo -e "\e[33m[warn] $*\e[39m"; }
 
 TEMPDIR=$(mktemp -d)
 NULL=/dev/null
-URL=
+URL=https://raw.githubusercontent.com/MarcMocker/PiHole_in_LXC/main/install
 UNBOUD_CONF=/etc/unbound/unbound.conf.d/pi-hole.conf
 SETUP_VARS=/etc/pihole/setupVars.conf
 ROOT_HINTS=/var/lib/unbound/root.hints

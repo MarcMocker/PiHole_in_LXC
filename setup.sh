@@ -2,7 +2,7 @@
 TMP=/tmp/installation.sh
 
 # URL of install script
-URL=https://github.com/MarcMocker/PiHole_in_LXC/
+URL=https://raw.githubusercontent.com/MarcMocker/PiHole_in_LXC/main/install
 
 if [ "$(uname)" != "Linux" ]; then
   echo "OS NOT SUPPORTED"
