@@ -28,7 +28,6 @@ apt-get install curl -y > $NULL
 info removing unused packages...
 apt-get autoremove -y > $NULL
 
-exit 1
 
 cd $TEMPDIR
 
