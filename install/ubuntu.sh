@@ -26,7 +26,7 @@ info removing unused packages...
 apt-get autoremove -y > $NULL
 
 
-cd $TEMPDIR
+cd "$TEMPDIR" || warn "cd TEMPDIR failed, please consider writing a bugreport" && exit 1
 
 info installing PiHole...
 curl -sSL https://install.pi-hole.net | bash
@@ -35,10 +35,10 @@ info installing Unbound...
 apt-get install unbound -y > $NULL
 
 info loading hints of DNS rootservers..
-wget https://www.internic.net/domain/named.root -qO- | sudo tee $ROOT_HINTS > $NULL
+wget https://www.internic.net/domain/named.root -qO- | tee $ROOT_HINTS > $NULL
 
 info setting up the unbound configuration file for pihole...
-wget $URL/pi-hole.conf -qO- | sudo tee $UNBOUD_CONF > $NULL
+wget $URL/pi-hole.conf -qO- | tee $UNBOUD_CONF > $NULL
 sleep 10
 service unbound restart > $NULL
 
@@ -58,13 +58,15 @@ else
 fi
 
 info Please set a new password for the webgui:
-read -p "> "
+warn antes del read
+read -r -s -p "> "
+warn despues del read
 PASSWD=$REPLY
-/usr/local/bin/pihole -a -p $PASSWD
+/usr/local/bin/pihole -a -p "$PASSWD"
 if [ $? -eq 0 ]; then
     info You are going to need this to log into your webinterface.
 else
-    echo ""
+    echo -e "\n"
     warn Password no set caused by an error.
     warn You may need to set it manually issuing
     warn ""
@@ -75,7 +77,7 @@ fi
 
 grep autoupdate.sh < /etc/crontab && info Installation finished sucessfully! && exit 0 || info Configuring automatic updates:
 
-wget $URL/autoupdate.sh -qO- | sudo tee $AUTOUPDATE_SCRIPT > $NULL
+wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT > $NULL
 chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
@@ -85,12 +87,12 @@ info "OPTION:  update daily at 1am        [2]"
 info "OPTION:  update never automatically [3]"
 info ""
 
-read -p "> "
+read -r -p "> "
 UPDATE_POLICY=$REPLY
 case $UPDATE_POLICY in
-    [1]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [1]"; break;;
-    [2]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [2]"; break;;
-    [3]* ) info "selected option [3] \n[info] This requires patching the system manually"; break;;
+    [1]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [1]";;
+    [2]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [2]";;
+    [3]* ) info "selected option [3] \n[info] This requires patching the system manually";;
     * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [1]";;
 esac
 
