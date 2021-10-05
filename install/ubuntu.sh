@@ -1,11 +1,28 @@
 #!/usr/bin/env bash
 
-function info { echo -e "\e[32m[info] $*\e[39m"; }
-function success { echo -e "\e[32m[done] $*\e[39m"; exit 0; }
-function warn { echo -e "\e[33m[warn] $*\e[39m"; }
-function error { echo -e "\e[31m[error] $*\e[39m"; exit 1; }
+function info {
+    echo -e "\e[32m[info] $*\e[39m";
+}
+function info-log {
+    echo -e "\e[32m[info] $*\e[39m";
+    echo -e "\e[32m[info] $*\e[39m" >> $LOG;
+}
+function success {
+    echo -e "\e[32m[done] $*\e[39m";
+    echo -e "\e[32m[done] $*\e[39m" >> $LOG;
+    exit 0;
+}
+function warn {
+    echo -e "\e[33m[warn] $*\e[39m";
+    echo -e "\e[33m[warn] $*\e[39m" >> $LOG;
+}
+function error {
+    echo -e "\e[31m[error] $*\e[39m";
+    echo -e "\e[31m[error] $*\e[39m" >> $LOG;
+    exit 1;
+}
 
-LOG=/root/.log/$(date -I)
+LOG=/root/.log/install.log
 NULL=/dev/null
 URL=https://raw.githubusercontent.com/MarcMocker/PiHole_in_LXC/main/install
 UNBOUD_CONF=/etc/unbound/unbound.conf.d/pi-hole.conf
@@ -14,31 +31,25 @@ ROOT_HINTS=/var/lib/unbound/root.hints
 AUTOUPDATE_SCRIPT=/root/autoupdate.sh
 
 mkdir /root/.log
-mkdir $LOG
 
 clear
 
-info updating dependencies...
-info updating dependencies... >> $LOG/updates.log
-apt-get update >> $LOG/updates.log
+info-log updating dependencies...
+apt-get update >> $LOG
 
-info updating installed packages...
-info updating installed packages... >> $LOG/updates.log
-apt-get dist-upgrade -y  >> $LOG/updates.log
+info-log updating installed packages...
+apt-get dist-upgrade -y  >> $LOG
 
-info installing dependencies...
-info installing dependencies... >> $LOG/updates.log
-apt-get install curl wget git -y >> $LOG/updates.log
+info-log installing dependencies...
+apt-get install curl wget git -y >> $LOG
 
-info removing unused packages...
-info removing unused packages... >> $LOG/updates.log
-apt-get autoremove -y >> $LOG/updates.log
+info-log removing unused packages...
+apt-get autoremove -y >> $LOG
 
 
-info installing PiHole...
-info installing PiHole... >> $LOG/pihole.log
+info-log installing PiHole...
 curl -sSL https://install.pi-hole.net | bash
-cp -b /etc/pihole/install.log $LOG/pihole.log
+cat /etc/pihole/install.log >> $LOG
 
 clear
 info updating dependencies...
@@ -47,22 +58,18 @@ info installing dependencies...
 info removing unused packages...
 info installing PiHole...
 
-info installing Unbound...
-info installing Unbound... >> $LOG/unbound.log
-apt-get install unbound -y >> $LOG/unbound.log
+info-log installing Unbound...
+apt-get install unbound -y >> $LOG
 
-info loading hints of DNS rootservers...
-info loading hints of DNS rootservers... >> $LOG/unbound.log
-wget https://www.internic.net/domain/named.root -qO- | tee $ROOT_HINTS >> $LOG/unbound.log
+info-log loading hints of DNS rootservers...
+wget https://www.internic.net/domain/named.root -qO- | tee $ROOT_HINTS >> $LOG
 
-info setting up the unbound configuration file for pihole...
-info setting up the unbound configuration file for pihole... >> $LOG/unbound.log
-wget $URL/pi-hole.conf -qO- | tee $UNBOUD_CONF >> $LOG/unbound.log
+info-log setting up the unbound configuration file for pihole...
+wget $URL/pi-hole.conf -qO- | tee $UNBOUD_CONF >> $LOG
 sleep 10
-service unbound restart >> $LOG/unbound.log
+service unbound restart >> $LOG
 
-info checking if DNS server is set properly
-info checking if DNS server is set properly >> $LOG/pihole.log
+info-log checking if DNS server is set properly
 if ! grep -q "PIHOLE_DNS_1=127.0.0.1#5335" "$SETUP_VARS"; then
     warn DNS need to be set manually >> $LOG/pihole.log
     echo ""
@@ -75,35 +82,32 @@ if ! grep -q "PIHOLE_DNS_1=127.0.0.1#5335" "$SETUP_VARS"; then
     warn DNS servers.
     echo ""
 else
-    info DNS set correctly
-    info DNS set correctly >> $LOG/pihole.log
+    info-log DNS set correctly
 fi
 
-info Please set a new password for the webgui:
-info Please set a new password for the webgui:  >> $LOG/pihole.log
+info-log Please set a new password for the webgui:
 
 read -r -s -p "> "
 
 PASSWD=$REPLY
 /usr/local/bin/pihole -a -p "$PASSWD"
 if [ $? -eq 0 ]; then
-    info You are going to need this to log into your webinterface.
-    info New password set correctly  >> $LOG/pihole.log
+    info New password set correctly  >> $LOG
+    info-log You are going to need this to log into your webinterface.
 else
-    warn Password no set caused by an error.  >> $LOG/pihole.log
+    warn Password no set caused by an error.  >> $LOG
     echo -e "\n"
     warn Password no set caused by an error.
-    warn You may need to set it manually issuing
+    warn You may need to set it manually issuing:
     warn ""
     warn "           pihole -a -p"
     echo ""
 fi
 
 
-grep autoupdate.sh < /etc/crontab > $NULL && success "Installation finished sucessfully!" || info Configuring automatic updates:
-info Configuring automatic updates: >> $LOG/autoupdates.log
+grep autoupdate.sh < /etc/crontab > $NULL && success "Installation finished sucessfully!" || info-log Configuring automatic updates:
 
-wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG/autoupdates.log
+wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG
 chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
@@ -116,10 +120,10 @@ info ""
 read -r -p "> "
 UPDATE_POLICY=$REPLY
 case $UPDATE_POLICY in
-    [1]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [1]" && info "selected option [1]" >> $LOG/autoupdates.log;;
-    [2]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [2]" && info "selected option [2]" >> $LOG/autoupdates.log;;
-    [3]* ) info "selected option [3] \n[info] This requires patching the system manually" && info "selected option [3] \n[info] This requires patching the system manually" >> $LOG/autoupdates.log;;
-    * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [1]" && info "selected default [1]" >> $LOG/autoupdates.log;;
+    [1]* ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected option [1]";;
+    [2]* ) echo "0 1 * * * /root/autoupdate.sh > /dev/null" >> /etc/crontab && info-log "selected option [2]";;
+    [3]* ) info-log "selected option [3] \n[info] This requires patching the system manually";;
+    * ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected default [1]";;
 esac
 
 success Installation finished sucessfully!

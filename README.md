@@ -1,3 +1,3 @@
 # PiHole inside an LXC container
 
-    wget --no-cache -qO - https://raw.githubusercontent.com/MarcMocker/PiHole_in_LXC/main/setup.sh | sh
+    wget -O "/tmp/setup.sh" "https://raw.githubusercontent.com/MarcMocker/PiHole_in_LXC/main/setup.sh" && sh /tmp/setup.sh
