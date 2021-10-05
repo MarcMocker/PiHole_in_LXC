@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function info { echo -e "\e[32m[info] $*\e[39m"; }
-function done { echo -e "\e[32m[done] $*\e[39m"; exit 0; }
+function success { echo -e "\e[32m[done] $*\e[39m"; exit 0; }
 function warn { echo -e "\e[33m[warn] $*\e[39m"; }
 function error { echo -e "\e[31m[error] $*\e[39m"; exit 1; }
 
@@ -100,7 +100,7 @@ else
 fi
 
 
-grep autoupdate.sh < /etc/crontab > $NULL && done "Installation finished sucessfully!" || info Configuring automatic updates:
+grep autoupdate.sh < /etc/crontab > $NULL && success "Installation finished sucessfully!" || info Configuring automatic updates:
 info Configuring automatic updates: >> $LOG/autoupdates.log
 
 wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG/autoupdates.log
@@ -122,4 +122,4 @@ case $UPDATE_POLICY in
     * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [1]" && info "selected default [1]" >> $LOG/autoupdates.log;;
 esac
 
-done Installation finished sucessfully!
+success Installation finished sucessfully!
