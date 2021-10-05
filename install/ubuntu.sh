@@ -58,7 +58,8 @@ else
 fi
 
 info Please set a new password for the webgui:
-read -p "> " PASSWD
+read -p "> "
+PASSWD=$REPLY
 /usr/local/bin/pihole -a -p $PASSWD
 if [ $? -eq 0 ]; then
     info You are going to need this to log into your webinterface.
@@ -79,17 +80,18 @@ chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
 info ""
-info "DEFAULT: update on boot             [b]"
-info "OPTION:  update daily at 1am        [d]"
-info "OPTION:  update never automatically [n]"
+info "DEFAULT: update on boot             [1]"
+info "OPTION:  update daily at 1am        [2]"
+info "OPTION:  update never automatically [3]"
 info ""
 
-read -p "> " UPDATE_POLICY
+read -p "> "
+UPDATE_POLICY=$REPLY
 case $UPDATE_POLICY in
-    [Bb]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [b]"; break;;
-    [Dd]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [d]"; break;;
-    [Nn]* ) info "selected option [n] \n[info] This requires patching the system manually"; break;;
-    * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [b]";;
+    [1]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [1]"; break;;
+    [2]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [2]"; break;;
+    [3]* ) info "selected option [3] \n[info] This requires patching the system manually"; break;;
+    * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [1]";;
 esac
 
 info Installation finished sucessfully!
