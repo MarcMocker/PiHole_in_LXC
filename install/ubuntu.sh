@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 function info { echo -e "\e[32m[info] $*\e[39m"; }
 function warn { echo -e "\e[33m[warn] $*\e[39m"; }
 
@@ -30,7 +28,7 @@ apt-get autoremove -y > $NULL
 cd $TEMPDIR
 
 info installing PiHole...
-curl -sSL https://install.pi-hole.net | bash
+curl -sSL https://install.pi-hole.net | bash > $NULL
 
 info installing Unbound...
 apt-get install unbound -y > $NULL
@@ -59,9 +57,22 @@ else
 fi
 
 info Please set a new password for the webgui:
-/usr/local/bin/pihole -a -p
+read -p "> " PASSWD
+/usr/local/bin/pihole -a -p $PASSWD
+if [ $? -eq 0 ]; then
+    info You are going to need this to log into your webinterface.
+else
+    echo ""
+    warn Password no set caused by an error.
+    warn You may need to set it manually issuing
+    warn ""
+    warn "           pihole -a -p"
+    echo ""
+fi
 
-info Configuring automatic updates:
+
+grep autoupdate.sh < /etc/crontab && info Installation finished sucessfully! && exit 0 || info Configuring automatic updates:
+
 wget $URL/autoupdate.sh -qO- | sudo tee $AUTOUPDATE_SCRIPT > $NULL
 chmod +x $AUTOUPDATE_SCRIPT
 
