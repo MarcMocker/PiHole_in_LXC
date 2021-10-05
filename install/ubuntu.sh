@@ -11,6 +11,7 @@ SETUP_VARS=/etc/pihole/setupVars.conf
 ROOT_HINTS=/var/lib/unbound/root.hints
 AUTOUPDATE_SCRIPT=/root/autoupdate.sh
 
+clear
 
 info updating dependencies...
 apt-get update > $NULL
@@ -78,8 +79,8 @@ chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
 while true; do
-    read -p "Do you wish to automatically update on boot [b], daily [d] or nothing of those [n]? " bdn
-    case $bdn in
+    read -p "Do you wish to automatically update on boot [b], daily [d] or nothing of those [n]? " UPDATE_POLICY
+    case $UPDATE_POLICY in
         [Bb]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab; break;;
         [Dd]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab; break;;
         [Nn]* ) warn Then you may setup a cronjob manually to ensure your system keeps patched.; break;;
