@@ -28,7 +28,7 @@ apt-get autoremove -y > $NULL
 cd $TEMPDIR
 
 info installing PiHole...
-curl -sSL https://install.pi-hole.net | bash > $NULL
+curl -sSL https://install.pi-hole.net | bash
 
 info installing Unbound...
 apt-get install unbound -y > $NULL
