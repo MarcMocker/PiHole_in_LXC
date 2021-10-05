@@ -28,7 +28,7 @@ apt-get dist-upgrade -y  >> $LOG/updates.log
 
 info installing dependencies...
 info installing dependencies... >> $LOG/updates.log
-apt-get install curl wget -y >> $LOG/updates.log
+apt-get install curl wget git -y >> $LOG/updates.log
 
 info removing unused packages...
 info removing unused packages... >> $LOG/updates.log
@@ -100,7 +100,7 @@ else
 fi
 
 
-grep autoupdate.sh < /etc/crontab > $NULL && done Installation finished sucessfully! || info Configuring automatic updates:
+grep autoupdate.sh < /etc/crontab > $NULL && done "Installation finished sucessfully!" || info Configuring automatic updates:
 info Configuring automatic updates: >> $LOG/autoupdates.log
 
 wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG/autoupdates.log
