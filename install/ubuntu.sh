@@ -78,14 +78,18 @@ wget $URL/autoupdate.sh -qO- | sudo tee $AUTOUPDATE_SCRIPT > $NULL
 chmod +x $AUTOUPDATE_SCRIPT
 
 info Please set a new update policy:
-while true; do
-    read -p "Do you wish to automatically update on boot [b], daily [d] or nothing of those [n]? " UPDATE_POLICY
-    case $UPDATE_POLICY in
-        [Bb]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab; break;;
-        [Dd]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab; break;;
-        [Nn]* ) warn Then you may setup a cronjob manually to ensure your system keeps patched.; break;;
-        * ) echo "Please answer boot, daily or nothing.";;
-    esac
-done
+info ""
+info "DEFAULT: update on boot             [b]"
+info "OPTION:  update daily at 1am        [d]"
+info "OPTION:  update never automatically [n]"
+info ""
+
+read -p "> " UPDATE_POLICY
+case $UPDATE_POLICY in
+    [Bb]* ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected option [b]"; break;;
+    [Dd]* ) echo "0 1 * * * ./root/autoupdate.sh > /dev/null" >> /etc/crontab && info "selected option [d]"; break;;
+    [Nn]* ) info "selected option [n] \n[info] This requires patching the system manually"; break;;
+    * ) echo @reboot root ./root/autoupdate.sh >> /etc/crontab && info "selected default [b]";;
+esac
 
 info Installation finished sucessfully!
