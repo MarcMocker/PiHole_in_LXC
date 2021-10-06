@@ -40,9 +40,9 @@ SERVICES[5]=Xiaomi
 function add_to_db(){
     LISTS=$1
     for LIST in $(curl "$URL/$LISTS"); do
-        echo-log "adding $LIST to the database..."
+        echo-log "[info] adding $LIST to the database..."
         sqlite3 $GRAVITY "INSERT INTO "adlist" ("address","enabled","comment") VALUES ('$LIST','1','$LISTS');"
-        echo-log done.
+        echo-log "[info] done."
     done
 
 }
@@ -61,7 +61,10 @@ done
 
 info-log adding $GENERAL anti-tracker lists:
 add_to_db $GENERAL
+info-log done.
 
-/usr/local/bin/pihole -g
+info-log updating gravity...
+/usr/local/bin/pihole -g > $LOG
+info-log done.
 
 success All lists successfully enabled!

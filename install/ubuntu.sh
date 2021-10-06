@@ -29,6 +29,9 @@ UNBOUD_CONF=/etc/unbound/unbound.conf.d/pi-hole.conf
 SETUP_VARS=/etc/pihole/setupVars.conf
 ROOT_HINTS=/var/lib/unbound/root.hints
 AUTOUPDATE_SCRIPT=/root/autoupdate.sh
+TMP=/tmp
+ADD_BLOCKLISTS=/add_blocklists.sh
+
 
 mkdir /root/.log
 
@@ -105,25 +108,40 @@ else
 fi
 
 
-grep autoupdate.sh < /etc/crontab > $NULL && success "Installation finished sucessfully!" || info-log Configuring automatic updates:
+grep autoupdate.sh < /etc/crontab > $NULL || setup_autoupdate
 
-wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG
-chmod +x $AUTOUPDATE_SCRIPT
+function setup_autoupdate(){
+    info-log Configuring automatic updates:
 
-info Please set a new update policy:
-info ""
-info "DEFAULT: update on boot             [1]"
-info "OPTION:  update daily at 1am        [2]"
-info "OPTION:  update never automatically [3]"
-info ""
+    wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG
+    chmod +x $AUTOUPDATE_SCRIPT
 
+    info Please set a new update policy:
+    info ""
+    info "DEFAULT: update on boot             [1]"
+    info "OPTION:  update daily at 1am        [2]"
+    info "OPTION:  update never automatically [3]"
+    info ""
+
+    read -r -p "> "
+    UPDATE_POLICY=$REPLY
+    case $UPDATE_POLICY in
+        [1]* ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected option [1]";;
+        [2]* ) echo "0 1 * * * /root/autoupdate.sh > /dev/null" >> /etc/crontab && info-log "selected option [2]";;
+        [3]* ) info-log "selected option [3] \n[info] This requires patching the system manually";;
+        * ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected default [1]";;
+    esac
+}
+
+info-log ""
+info-log Installation finished sucessfully!
+info-log ""
+
+echo ""
+
+info-log Do you like to preset blocklists? [Y/n]
 read -r -p "> "
-UPDATE_POLICY=$REPLY
-case $UPDATE_POLICY in
-    [1]* ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected option [1]";;
-    [2]* ) echo "0 1 * * * /root/autoupdate.sh > /dev/null" >> /etc/crontab && info-log "selected option [2]";;
-    [3]* ) info-log "selected option [3] \n[info] This requires patching the system manually";;
-    * ) echo @reboot root /root/autoupdate.sh >> /etc/crontab && info-log "selected default [1]";;
+case $REPLY in
+    [Nn]* ) success "terminating installer...";;
+    * ) info-log Starting script... && wget -O "$TMP/$ADD_BLOCKLISTS" "$URL/$ADD_BLOCKLISTS" && sh $TMP/$ADD_BLOCKLISTS;;
 esac
-
-success Installation finished sucessfully!
