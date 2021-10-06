@@ -22,7 +22,7 @@ chmod +x "$TMP"
 
 # the pihole command is located in /usr/local/bin
 export PATH="/usr/local/bin:$PATH"
-echo export PATH='/usr/local/bin:$PATH' >> $HOME/.bashrc
+echo export PATH="/usr/local/bin:$PATH" >> "$HOME"/.bashrc
 
 if [ "$(command -v bash)" ]; then
   sudo bash "$TMP"
