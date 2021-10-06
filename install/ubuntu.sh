@@ -35,7 +35,7 @@ TMP=/tmp
 ADD_BLOCKLISTS=/add_blocklists.sh
 
 # SCRIPT-CONTENT RELATED FUNCTIONS
-function setup_autoupdate{
+function setup_autoupdate {
     info-log Configuring automatic updates:
 
     wget $URL/autoupdate.sh -qO- | tee $AUTOUPDATE_SCRIPT >> $LOG
